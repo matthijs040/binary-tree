@@ -63,6 +63,25 @@ void tree_values_are_ascending_left_to_right_at_depth_1_single_ordered_insertion
     assert(std::vector<value_t>({-7, -5, -2, 0, 2, 5, 7}) == returned_values && "Returned values in the tree are incorrect.");
 }
 
+void tree_values_are_ascending_left_to_right_at_depth_2_single_ordered_insertion()
+{
+    Tree tree{0};
+    tree.insert({-15, -9, -8, -6,  -5 , -4, -2, 2, 3, 5, 7, 8 });
+
+    auto returned_values = tree.get_values();
+    assert(std::vector<value_t>({-15, -9, -8, -6,  -5 , -4, -2, 0, 2, 3, 5, 7, 8 }) == returned_values && "Returned values in the tree are incorrect.");    
+}
+
+void tree_values_are_ascending_left_to_right_at_depth_2_single_unordered_insertion()
+{
+    Tree tree{0};
+    tree.insert({-6, -8, -9, -15,  7 , -4, -2, 2, 3, 5, -5, 8 });
+
+    auto returned_values = tree.get_values();
+    assert(std::vector<value_t>({-15, -9, -8, -6,  -5 , -4, -2, 0, 2, 3, 5, 7, 8 }) == returned_values && "Returned values in the tree are incorrect.");    
+}
+
+
 void tree_inserted_duplicates_increase_count_and_size()
 {
     Tree tree{0};
@@ -109,6 +128,25 @@ void tree_removing_non_duplicated_nodes_removes_them()
     assert(result == expected);
 }
 
+void tree_calling_remove_all_removes_duplicates()
+{
+    Tree tree{0};
+    tree.insert({ 0, 0, 1, 2, 2, 3});
+    tree.remove_all(0);
+    tree.remove_all(2);
+
+    assert(tree.size() == 2);
+    auto expected_values = std::vector<value_t>{ 1,3};
+    assert(tree.get_values() == expected_values  ); 
+}
+
+void tree_removing_all_nodes_clears_tree()
+{
+    Tree tree{0};
+    tree.insert({-3, -1, -2, 2, 1, 3}); 
+
+}
+
 
 int main(int argc, char const *argv[])
 {
@@ -117,10 +155,14 @@ int main(int argc, char const *argv[])
     tree_values_are_ascending_left_to_right_at_root();
     tree_values_are_ascending_left_to_right_at_depth_1_multiple_insertions();
     tree_values_are_ascending_left_to_right_at_depth_1_single_ordered_insertion();
+    tree_values_are_ascending_left_to_right_at_depth_2_single_ordered_insertion();
+    tree_values_are_ascending_left_to_right_at_depth_2_single_unordered_insertion();
 
     tree_inserted_duplicates_increase_count_and_size();
     tree_removing_duplicates_decrease_count();
     tree_removing_non_duplicated_nodes_removes_them();
+    tree_calling_remove_all_removes_duplicates();
+    
 
     return EXIT_SUCCESS;
 }

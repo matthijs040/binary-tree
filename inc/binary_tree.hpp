@@ -5,8 +5,6 @@
 
 using value_t = int;
 
-
-
 class Tree
 {
     private:
@@ -60,52 +58,57 @@ class Tree
 
         }
 
-        void remove(value_t val)
+        size_t remove(value_t val, const bool remove_all = false)
         {
             if(rhs)
             {
                 if(val == rhs->value)
                 {
-                    if( --(rhs->pCount) == 0 )
+                    if( remove_all || --(rhs->pCount) == 0 )
                     {
+                        const auto num_removed = rhs->pCount;
                         if(rhs->lhs)        // If it has an lhs
                         {
                             if(rhs->rhs)    // And a rhs atop of that.
                                 rhs->lhs->insert(*(rhs->rhs)); // NOTE: I think this can be moved without the deref copy.
                             this->rhs = std::move(rhs->lhs);
-                            return;
                         }
                         else if(rhs->rhs)   // If it has only an rhs
                             this->rhs = std::move(rhs->rhs);
                         else
                             this->rhs = nullptr;
+                        return num_removed;
                     }
+                    return 1;
                 }
                 else if(val > value)
-                    rhs->remove(val);
+                    return rhs->remove(val, remove_all);
             }
             if(lhs)
             {
                 if(val == lhs->value)
                 {
-                    if( --(lhs->pCount) == 0 )
+                    if( remove_all || --(lhs->pCount) == 0 )
                     {
+                        const auto num_removed = lhs->pCount;
                         if(lhs->rhs)
                         {
                             if(lhs->lhs)
                                 lhs->rhs->insert(*(lhs->lhs)); // I think this can be moved without the deref copy.
                             this->lhs = std::move(lhs->rhs);
-                            return;
                         }
                         else if(lhs->lhs)
                             this->lhs = std::move(lhs->lhs);
                         else
                             this->lhs = nullptr;
+                        
+                        return num_removed;
                     }
                 }
                 else if(val < value)
-                    lhs->remove(val);
+                    return lhs->remove(val, remove_all);
             }
+            return 0;
         }
     
         bool contains(value_t val)
@@ -184,7 +187,7 @@ class Tree
         tree_size++;
     }
 
-    void insert(const std::vector<value_t> values)
+    void insert(const std::vector<value_t>& values)
     {
         for(const auto& v : values)
         {
@@ -194,10 +197,13 @@ class Tree
 
     void remove(const value_t n)
     {
-        true_root.remove(n);
+        tree_size = tree_size - true_root.remove(n);
     }
 
-    void remove_all(const value_t n);
+    void remove_all(const value_t n)
+    {
+        tree_size = tree_size - true_root.remove(n, true);
+    }
 
     size_t size() 
     { 
