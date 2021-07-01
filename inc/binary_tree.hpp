@@ -84,7 +84,7 @@ class Tree
                 else if(val > value)
                     rhs->remove(val);
             }
-            else if(lhs)
+            if(lhs)
             {
                 if(val == lhs->value)
                 {
@@ -113,14 +113,14 @@ class Tree
             if(val == value)
                 return true;
 
-            if(val > value)
+            else if(val > value)
             {
                 if(rhs)
                     return rhs->contains(val);
                 else 
                     return false;
             }
-            if(val < value)
+            else // if(val < value)
             {
                 if(lhs)
                     return lhs->contains(val);
@@ -134,14 +134,14 @@ class Tree
             if(val == value)
                 return pCount;
 
-            if(val > value)
+            else if(val > value)
             {
                 if(rhs)
                     return rhs->count(val);
                 else 
                     return 0;
             }
-            if(val < value)
+            else // if(val < value)
             {
                 if(lhs)
                     return lhs->count(val);
@@ -154,9 +154,12 @@ class Tree
         {
             if(lhs)
                 lhs->get_values(values);
+            
+            values.push_back(value);
+            
             if(rhs)
                 rhs->get_values(values);
-            values.push_back(value);
+
         }
     };
 
