@@ -14,42 +14,42 @@ class Tree
     struct Node  
     {
         value_t value;
-        size_t count;
+        size_t pCount;
         std::unique_ptr<Node> lhs;
         std::unique_ptr<Node> rhs;
-    
+
         Node(value_t value)
         : value(value)
-        , count(1)
+        , pCount(1)
         , lhs(nullptr)
         , rhs(nullptr)
         {}
-    
+
         Node(Node& other)
         {
             this->value = other.value;
-            this->count = other.count;
+            this->pCount = other.pCount;
             this->lhs = std::move(other.lhs);
             this->rhs = std::move(other.rhs);
         } 
-    
+
         void insert(Node& n)
         {
             if(n.value == value)
             {
-                count++;
+                pCount++;
                 if(n.lhs)
                     lhs->insert(*n.lhs);
                 if(n.rhs)
                     rhs->insert(*n.rhs);
             }
-    
+
             else if(n.value > value)
                 if(rhs)
                     rhs->insert(n);
                 else
                     rhs = std::make_unique<Node>(n);
-            
+
             else if(n.value < value)
             {
                 if(lhs)
@@ -57,16 +57,16 @@ class Tree
                 else
                     lhs = std::make_unique<Node>(n);
             }
-    
+
         }
-    
+
         void remove(value_t val)
         {
             if(rhs)
             {
                 if(val == rhs->value)
                 {
-                    if( --(rhs->count) == 0 )
+                    if( --(rhs->pCount) == 0 )
                     {
                         if(rhs->lhs)        // If it has an lhs
                         {
@@ -88,7 +88,7 @@ class Tree
             {
                 if(val == lhs->value)
                 {
-                    if( --(lhs->count) == 0 )
+                    if( --(lhs->pCount) == 0 )
                     {
                         if(lhs->rhs)
                         {
@@ -107,17 +107,69 @@ class Tree
                     lhs->remove(val);
             }
         }
+    
+        bool contains(value_t val)
+        {
+            if(val == value)
+                return true;
+
+            if(val > value)
+            {
+                if(rhs)
+                    return rhs->contains(val);
+                else 
+                    return false;
+            }
+            if(val < value)
+            {
+                if(lhs)
+                    return lhs->contains(val);
+                else
+                    return false;
+            }
+        }
+    
+        size_t count(value_t val)
+        {
+            if(val == value)
+                return pCount;
+
+            if(val > value)
+            {
+                if(rhs)
+                    return rhs->count(val);
+                else 
+                    return 0;
+            }
+            if(val < value)
+            {
+                if(lhs)
+                    return lhs->count(val);
+                else
+                    return 0;
+            }
+        }
+
+        void get_values(std::vector<value_t>& values)
+        {
+            if(lhs)
+                lhs->get_values(values);
+            if(rhs)
+                rhs->get_values(values);
+            values.push_back(value);
+        }
     };
 
     Node root;
     Node true_root;
-    size_t size;
+    size_t tree_size;
 
     public:
 
     Tree(value_t value) 
     : root(value)
-    , true_root(0)
+    , true_root(INT32_MAX)
+    , tree_size(1)
     {
         true_root.insert(root);
     }
@@ -125,7 +177,8 @@ class Tree
     void insert(const value_t val)
     {
         Node to_insert{val};
-        root.insert(to_insert);
+        true_root.insert(to_insert);
+        tree_size++;
     }
 
     void insert(const std::vector<value_t> values)
@@ -143,8 +196,26 @@ class Tree
 
     void remove_all(const value_t n);
 
-    size_t count() 
+    size_t size() 
     { 
-        return size; 
+        return tree_size; 
+    }
+
+    bool contains(value_t val)
+    {
+        return true_root.contains(val);
+    }
+
+    size_t count(value_t val)
+    {
+        return true_root.count(val);
+    }
+
+    std::vector<value_t> get_values()
+    {
+        std::vector<value_t> ret;
+        ret.reserve(tree_size);
+        true_root.lhs->get_values(ret);
+        return ret;
     }
 };
